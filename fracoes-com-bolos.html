@@ -1,0 +1,1446 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Frações com bolos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap">
+<style>
+/* Layout: header, tab bar and a single column; the builder queue wraps into rows on narrow screens. */
+:root {
+  --paper: #fbf5ea;
+  --card: #ffffff;
+  --ink: #2d2a3e;
+  --muted: #666179;
+  --line: #e6dccb;
+  --accent: #c94f2b;
+  --accent-soft: #fbe3d7;
+  --accent-ink: #ffffff;
+  --crumb: #efe2c8;
+  --ok: #237253;
+  --ok-soft: #dcf1e6;
+  --bad: #b33a2a;
+  --bad-soft: #f8dfd9;
+  --shadow: 0 1px 2px rgba(45, 42, 62, .06), 0 8px 22px rgba(45, 42, 62, .07);
+  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1c1a26;
+    --card: #26233a;
+    --ink: #f2ede2;
+    --muted: #aaa3bd;
+    --line: #3b3751;
+    --accent: #f08a5d;
+    --accent-soft: #3d2c33;
+    --accent-ink: #1c1a26;
+    --crumb: #4a4358;
+    --ok: #6cd3a2;
+    --ok-soft: #1f3a30;
+    --bad: #ff8a78;
+    --bad-soft: #43262c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 22px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1c1a26;
+  --card: #26233a;
+  --ink: #f2ede2;
+  --muted: #aaa3bd;
+  --line: #3b3751;
+  --accent: #f08a5d;
+  --accent-soft: #3d2c33;
+  --accent-ink: #1c1a26;
+  --crumb: #4a4358;
+  --ok: #6cd3a2;
+  --ok-soft: #1f3a30;
+  --bad: #ff8a78;
+  --bad-soft: #43262c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 22px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+h2 { font-size: 1.35rem; }
+h3 { font-size: 1.1rem; }
+p { margin: 0; }
+[hidden] { display: none !important; }
+
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+.app-head {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.app-head p { color: var(--muted); margin-top: 4px; max-width: 46ch; }
+
+/* Tabs */
+.tabs {
+  max-width: 1120px;
+  margin: 18px auto 0;
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+.tab {
+  flex: 1 0 auto;
+  border: 0;
+  background: transparent;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.tab:not([aria-selected="true"]):hover { color: var(--ink); background: var(--accent-soft); }
+
+.view { max-width: 1120px; margin: 20px auto 0; min-width: 0; }
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.panel + .panel { margin-top: 16px; }
+.muted { color: var(--muted); font-size: .92rem; }
+
+/* Buttons and chips */
+.btn {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.05); }
+.btn.small { padding: 5px 10px; font-size: .88rem; }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .45; cursor: default; border-color: var(--line); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: .9rem;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.toggles { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: .95rem; }
+.toggles label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+/* Fraction notation (stacked, with bar) */
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
+  min-width: 2ch;
+}
+.frac .num, .frac .den { display: block; padding: 2px 6px; font-variant-numeric: tabular-nums; }
+.frac .bar { display: block; width: 100%; min-width: 2.2ch; height: 3px; border-radius: 2px; background: currentColor; }
+.frac.big { font-size: 2.6rem; }
+.frac.mid { font-size: 1.7rem; }
+.frac.sm { font-size: 1.2rem; }
+
+/* Cakes */
+.cakes { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 6px 8px; min-height: 120px; }
+.cake { width: 130px; max-width: 100%; height: auto; display: block; }
+.cake.lg { width: 180px; }
+.result-frac { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--ink); }
+.result-frac .sign { font-family: var(--font-display); font-size: 2.2rem; font-weight: 600; }
+.group-title { font-family: var(--font-display); font-size: 1.1rem; margin: 18px 0 8px; }
+.group-title:first-of-type { margin-top: 4px; }
+.result-lines span { display: block; }
+.cake-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+/* Builder queue */
+.queue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+  justify-content: center;
+}
+.op-card {
+  width: 280px;
+  max-width: 100%;
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.op-card header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.op-card .title { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+.op-card .cakes { min-height: 0; }
+.op-card .fraction-box { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.op-card .note { font-size: .85rem; color: var(--muted); text-align: center; min-height: 1.2em; }
+.inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field span { font-size: .8rem; font-weight: 800; color: var(--muted); letter-spacing: .02em; }
+.field input[type="number"], .field select, .answer input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.colors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.colors .field input[type="color"] {
+  width: 100%;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.op-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+}
+.op-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 600;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+  padding: 0;
+}
+.equals {
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 0 4px;
+}
+.add-card {
+  width: 170px;
+  max-width: 100%;
+  border: 2px dashed var(--line);
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 120px;
+  align-self: stretch;
+}
+.add-card:hover { border-color: var(--accent); color: var(--accent); }
+.add-card:disabled { opacity: .5; cursor: default; }
+
+.result-pair { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.result-card { border-color: var(--ok); }
+.result-card .title { color: var(--ok); }
+.result-card.error { border-color: var(--bad); }
+.result-card.error .title { color: var(--bad); }
+.result-msg {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border-radius: 10px;
+  padding: 10px;
+  font-size: .92rem;
+  text-align: center;
+  font-weight: 700;
+}
+.result-lines { display: grid; gap: 4px; font-size: .92rem; text-align: center; }
+.result-lines strong { font-variant-numeric: tabular-nums; }
+
+/* Steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: step; }
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.steps li::before {
+  content: counter(step);
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 800;
+  font-size: .85rem;
+}
+.steps li .step-title { font-weight: 800; }
+.steps li p { color: var(--muted); font-size: .95rem; margin-top: 2px; }
+.steps li .math { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.precedence { font-size: .92rem; background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+
+/* Practice */
+.practice-head { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.score { display: flex; gap: 10px; flex-wrap: wrap; font-size: .92rem; font-weight: 800; }
+.score span { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.q-body { display: grid; gap: 16px; justify-items: center; text-align: center; }
+.q-prompt { font-family: var(--font-display); font-size: 1.25rem; font-weight: 500; }
+.q-visual { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: flex-end; }
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; width: 100%; max-width: 620px; }
+.option {
+  border: 2px solid var(--line);
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 12px 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+}
+.option:hover { border-color: var(--accent); }
+.option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.option.correct { border-color: var(--ok); background: var(--ok-soft); }
+.option.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.option .frac { font-size: 1.6rem; }
+.cmp-options { display: flex; gap: 12px; justify-content: center; }
+.cmp-options .option { min-width: 84px; font-family: var(--font-display); font-size: 2rem; min-height: 64px; }
+.answer { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+.answer input { width: 84px; text-align: center; font-size: 1.3rem; }
+.answer .slash { font-family: var(--font-display); font-size: 1.8rem; color: var(--muted); }
+.feedback {
+  width: 100%;
+  max-width: 620px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+  text-align: center;
+}
+.feedback.ok { background: var(--ok-soft); color: var(--ok); }
+.feedback.bad { background: var(--bad-soft); color: var(--bad); }
+.feedback.info { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
+.feedback small { display: block; font-weight: 600; color: var(--ink); margin-top: 4px; }
+.q-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.empty-hint { color: var(--muted); }
+.answer strong { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; }
+.feedback-slot { width: 100%; max-width: 620px; }
+.feedback-slot:empty { display: none; }
+.mini-steps { text-align: left; margin: 8px 0 0; padding-left: 1.2em; font-size: .9rem; font-weight: 600; display: grid; gap: 4px; }
+.mini-steps strong { font-weight: 800; }
+.mini-steps + .btn { margin-top: 10px; }
+.practice-head .field { gap: 2px; }
+.practice-head .field select { min-width: 130px; }
+.feedback .btn { background: var(--card); color: var(--ink); border-color: var(--line); }
+
+/* Concepts */
+.concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.concepts > .panel + .panel { margin-top: 0; }
+.concept { display: grid; gap: 12px; align-content: start; }
+.concept p + p { margin-top: 6px; }
+.concept .examples { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; justify-content: center; background: var(--paper); border-radius: 12px; padding: 12px; }
+.concept .rule { font-family: var(--font-display); font-size: 1.05rem; background: var(--paper); border-radius: 10px; padding: 8px 12px; font-variant-numeric: tabular-nums; }
+.concept ul { margin: 0; padding-left: 1.1em; color: var(--muted); }
+.concept .mini { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; font-family: var(--font-display); font-size: 1.2rem; }
+
+/* Motion */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Small screens */
+@media (max-width: 560px) {
+  .op-card { width: 100%; }
+  .result-pair { flex-direction: column; width: 100%; }
+  .add-card { width: 100%; min-height: 64px; }
+  .equals { align-self: center; }
+  .op-slot { flex-direction: row; min-width: 0; }
+  .queue { gap: 10px; }
+  .cake { width: 120px; }
+  .cake.lg { width: 150px; }
+}
+
+</style>
+
+<header class="app-head">
+  <div>
+    <h1>Frações com bolos</h1>
+    <p>Monte operações com bolos. A parte pintada é o numerador, e o total de fatias é o denominador.</p>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Seções do app">
+  <button class="tab" role="tab" id="tab-build" aria-controls="view-build" aria-selected="true" tabindex="0" data-tab="build">Construir</button>
+  <button class="tab" role="tab" id="tab-practice" aria-controls="view-practice" aria-selected="false" tabindex="-1" data-tab="practice">Praticar</button>
+  <button class="tab" role="tab" id="tab-concepts" aria-controls="view-concepts" aria-selected="false" tabindex="-1" data-tab="concepts">Conceitos</button>
+</nav>
+
+<main>
+  <section class="view" id="view-build" role="tabpanel" aria-labelledby="tab-build">
+    <div class="panel">
+      <div class="toolbar">
+        <div class="chips" aria-label="Exemplos prontos">
+          <span class="muted">Exemplos:</span>
+          <span id="examples" class="chips"></span>
+        </div>
+        <div class="chips">
+          <button type="button" class="btn" id="random-op">Sortear</button>
+          <button type="button" class="btn primary" id="add-op">+ Adicionar fração</button>
+        </div>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="show-separate" checked> Separar fatias</label>
+        <label><input type="checkbox" id="show-numbers"> Mostrar número das fatias</label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="queue" id="queue"></div>
+    </div>
+
+    <section class="panel" aria-labelledby="steps-title">
+      <h2 id="steps-title">Passo a passo</h2>
+      <p class="muted">Veja como o resultado é calculado, uma operação de cada vez.</p>
+      <div id="steps-body"></div>
+    </section>
+  </section>
+
+  <section class="view" id="view-practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+    <div class="panel">
+      <div class="practice-head">
+        <div class="chips" id="p-types" role="group" aria-label="Tipo de exercício"></div>
+        <div class="chips">
+          <label class="field"><span>Nível</span><select id="p-level"></select></label>
+          <button type="button" class="btn small" id="p-reset">Recomeçar contagem</button>
+        </div>
+      </div>
+      <div class="score"><span id="p-score">Acertos: 0 de 0</span><span id="p-streak">Sequência: 0</span></div>
+    </div>
+
+    <form class="panel" id="p-form" autocomplete="off">
+      <div class="q-body">
+        <p class="q-prompt" id="p-prompt"></p>
+        <div id="p-visual"></div>
+        <div id="p-answer"></div>
+        <div id="p-feedback" class="feedback-slot"></div>
+        <div class="q-actions">
+          <button type="submit" class="btn primary" id="p-check">Verificar</button>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section class="view" id="view-concepts" role="tabpanel" aria-labelledby="tab-concepts" hidden>
+    <div class="concepts" id="concepts"></div>
+  </section>
+</main>
+
+<script>
+/* Aritmética de frações com explicação passo a passo.
+   Frações são objetos { n, d } com d > 0 (o sinal fica no numerador). */
+const Frac = (() => {
+  const SYM = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+  const OP_NAME = { '+': 'Somar', '-': 'Subtrair', '*': 'Multiplicar', '/': 'Dividir' };
+
+  const gcd = (a, b) => {
+    a = Math.abs(a); b = Math.abs(b);
+    while (b) { [a, b] = [b, a % b]; }
+    return a;
+  };
+  const lcm = (a, b) => (a / gcd(a, b)) * b;
+
+  const simplify = f => {
+    if (f.n === 0) return { n: 0, d: 1 };
+    const g = gcd(f.n, f.d);
+    return { n: f.n / g, d: f.d / g };
+  };
+
+  const str = f => `${f.n}/${f.d}`;
+
+  // Texto da fração com sinal, p.ex. "−3/4"
+  const strSigned = f => (f.n < 0 ? '−' : '') + `${Math.abs(f.n)}/${f.d}`;
+
+  const decimal = f => {
+    const v = f.n / f.d;
+    return v.toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+  };
+
+  // Número misto de |f|: { whole, rem, d }
+  const mixedParts = f => {
+    const a = Math.abs(f.n);
+    return { whole: Math.floor(a / f.d), rem: a % f.d, d: f.d };
+  };
+
+  // "2 1/4", "3", "3/4" (sem sinal)
+  const mixedText = f => {
+    const { whole, rem, d } = mixedParts(f);
+    if (d === 1) return `${whole}`;
+    if (whole === 0) return `${rem}/${d}`;
+    if (rem === 0) return `${whole}`;
+    return `${whole} ${rem}/${d}`;
+  };
+
+  const isImproper = f => Math.abs(f.n) > f.d && f.d > 1;
+
+  // Quantos bolos são necessários para representar |f| (mínimo 1)
+  const cakeCount = f => Math.max(1, Math.ceil(Math.abs(f.n) / f.d));
+
+  // Fatias pintadas no bolo k (0 = primeiro bolo do grupo)
+  const coloredInCake = (f, k) => Math.max(0, Math.min(f.d, Math.abs(f.n) - k * f.d));
+
+  const equal = (a, b) => a.n * b.d === b.n * a.d;
+
+  const compare = (a, b) => Math.sign(a.n * b.d - b.n * a.d);
+
+  // Operação binária entre duas frações (ambas >= 0 nas entradas)
+  // Retorna { error, raw, simp, steps: [{title, text, math}] }
+  function applyOp(a, op, b) {
+    const steps = [];
+    const A = str(a), B = str(b);
+
+    if (op === '+' || op === '-') {
+      const sign = op === '+' ? 1 : -1;
+      let x = a.n, y = b.n, L = a.d;
+      if (a.d === b.d) {
+        steps.push({
+          title: 'Denominadores iguais',
+          text: `Os dois têm denominador ${L}. Mantemos o denominador e operamos só os numeradores.`,
+          math: `${A} ${SYM[op]} ${B}`
+        });
+      } else {
+        L = lcm(a.d, b.d);
+        x = a.n * (L / a.d);
+        y = b.n * (L / b.d);
+        steps.push({
+          title: 'Denominadores diferentes',
+          text: `Precisamos de um denominador comum. O MMC de ${a.d} e ${b.d} é ${L}, então esse será o novo denominador.`,
+          math: `MMC(${a.d}, ${b.d}) = ${L}`
+        });
+        steps.push({
+          title: 'Frações equivalentes',
+          text: `Reescrevemos cada fração com denominador ${L}, multiplicando numerador e denominador pelo mesmo número.`,
+          math: `${A} = ${x}/${L}   e   ${B} = ${y}/${L}`
+        });
+      }
+      const n = x + sign * y;
+      const raw = { n, d: L };
+      steps.push({
+        title: op === '+' ? 'Somar os numeradores' : 'Subtrair os numeradores',
+        text: n < 0
+          ? 'O resultado é negativo, pois a segunda fração é maior que a primeira.'
+          : `Operamos os numeradores e mantemos o denominador ${L}.`,
+        math: `${x}/${L} ${SYM[op]} ${y}/${L} = ${n}/${L}`
+      });
+      return finish(raw, steps);
+    }
+
+    if (op === '*') {
+      const raw = { n: a.n * b.n, d: a.d * b.d };
+      steps.push({
+        title: 'Multiplicar em linha',
+        text: 'Multiplicamos numerador por numerador e denominador por denominador.',
+        math: `(${a.n} × ${b.n}) / (${a.d} × ${b.d}) = ${raw.n}/${raw.d}`
+      });
+      return finish(raw, steps);
+    }
+
+    if (op === '/') {
+      if (b.n === 0) {
+        return {
+          error: `Não existe divisão por zero. A fração ${B} vale zero, então não pode ser o divisor.`,
+          raw: null, simp: null, steps
+        };
+      }
+      const inv = { n: b.d, d: b.n };
+      steps.push({
+        title: 'Dividir é multiplicar pelo inverso',
+        text: `Trocamos numerador e denominador da segunda fração (o inverso dela) e multiplicamos.`,
+        math: `${A} ÷ ${B} = ${A} × ${str(inv)}`
+      });
+      const raw = { n: a.n * inv.n, d: a.d * inv.d };
+      steps.push({
+        title: 'Multiplicar em linha',
+        text: 'Agora multiplicamos numerador por numerador e denominador por denominador.',
+        math: `(${a.n} × ${inv.n}) / (${a.d} × ${inv.d}) = ${raw.n}/${raw.d}`
+      });
+      return finish(raw, steps);
+    }
+
+    throw new Error('Operação desconhecida: ' + op);
+  }
+
+  // Simplificação: acrescenta o passo "Simplificar" e devolve o resultado
+  function finish(raw, steps) {
+    const simp = simplify(raw);
+    if (raw.n === 0) {
+      steps.push({
+        title: 'Resultado zero',
+        text: 'Zero dividido por qualquer número diferente de zero é zero.',
+        math: `${str(raw)} = 0`
+      });
+    } else {
+      const g = gcd(raw.n, raw.d);
+      steps.push({
+        title: 'Simplificar',
+        text: g > 1
+          ? `Dividimos numerador e denominador por ${g}, que é o MDC de ${Math.abs(raw.n)} e ${raw.d}.`
+          : 'A fração já está na forma mais simples: o MDC entre numerador e denominador é 1.',
+        math: g > 1 ? `${strSigned(raw)} = ${strSigned(simp)}` : strSigned(simp)
+      });
+    }
+    return { error: null, raw, simp, steps };
+  }
+
+  // Avalia uma expressão: values[i] op[i] values[i+1] ...
+  // Multiplicações e divisões primeiro (da esquerda para a direita), depois somas e subtrações.
+  function evaluate(values, ops) {
+    const groups = [];
+    const hasMulDiv = ops.some(o => o === '*' || o === '/');
+    const hasAddSub = ops.some(o => o === '+' || o === '-');
+    const mixed = hasMulDiv && hasAddSub;
+    let lastRaw = values[0];
+
+    // Etapa 1: × e ÷
+    const terms = [values[0]];
+    const addOps = [];
+    for (let i = 0; i < ops.length; i++) {
+      const op = ops[i];
+      const v = values[i + 1];
+      if (op === '*' || op === '/') {
+        const left = terms[terms.length - 1];
+        const r = applyOp(left, op, v);
+        groups.push({ heading: `${str(left)} ${SYM[op]} ${str(v)}`, op, error: r.error, steps: r.steps, result: r.simp });
+        if (r.error) return { error: r.error, groups, raw: null, simp: null, mixed };
+        lastRaw = r.raw;
+        terms[terms.length - 1] = r.simp;
+      } else {
+        addOps.push(op);
+        terms.push(v);
+      }
+    }
+
+    // Etapa 2: + e −
+    let acc = terms[0];
+    for (let j = 0; j < addOps.length; j++) {
+      const op = addOps[j];
+      const v = terms[j + 1];
+      const r = applyOp(acc, op, v);
+      groups.push({ heading: `${str(acc)} ${SYM[op]} ${str(v)}`, op, error: r.error, steps: r.steps, result: r.simp });
+      if (r.error) return { error: r.error, groups, raw: null, simp: null, mixed };
+      lastRaw = r.raw;
+      acc = r.simp;
+    }
+
+    return { error: null, groups, raw: lastRaw, simp: acc, mixed };
+  }
+
+  return {
+    SYM, OP_NAME, gcd, lcm, simplify, str, strSigned, decimal, mixedParts, mixedText,
+    isImproper, cakeCount, coloredInCake, equal, compare, applyOp, evaluate
+  };
+})();
+
+
+
+/* Desenho dos bolos. Cada bolo tem d fatias; as n primeiras são a parte numeradora
+   (cor própria), as demais usam a cor "resto". Usa o global Frac de math.js. */
+const Cake = (() => {
+  const VW = 220, VH = 164;
+  const RX = 78, RY = 32, H = 50;     // raio horizontal, vertical (perspectiva) e altura
+  const CX = 110, CY = 62;            // centro da tampa
+  const SEP = 9;                      // deslocamento das fatias quando "separar"
+  const BODY = '#e2c08f', BODY_EDGE = '#a57a45';
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // Cor do texto que fica legível sobre a cor de fundo (hex #rrggbb)
+  function textOn(hex) {
+    const v = parseInt(hex.slice(1), 16);
+    const r = (v >> 16) & 255, g = (v >> 8) & 255, b = v & 255;
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.6 ? '#2d2a3e' : '#ffffff';
+  }
+
+  // Um bolo: d fatias, n pintadas
+  function svg({ d, n, colN, colR, separate = true, numbers = false, label = '', cls = 'cake' }) {
+    const parts = [];
+    parts.push(`<path d="M${CX - RX},${CY} L${CX - RX},${CY + H} A${RX},${RY} 0 0 0 ${CX + RX},${CY + H} L${CX + RX},${CY} Z" fill="${BODY}" stroke="${BODY_EDGE}" stroke-width="1"/>`);
+
+    if (d === 1) {
+      // Um único pedaço: desenhar a tampa inteira (um arco de 360° não tem como ser um wedge)
+      const fill = n >= 1 ? colN : colR;
+      parts.push(`<ellipse cx="${CX}" cy="${CY}" rx="${RX}" ry="${RY}" fill="${fill}" stroke="#ffffff" stroke-width="1.6"/>`);
+    } else {
+      const sep = separate ? SEP : 0;
+      const step = (Math.PI * 2) / d;
+      const gap = 0.025;
+      for (let i = 0; i < d; i++) {
+        const a1 = -Math.PI / 2 + i * step + gap / 2;   // começa às 12h e segue no sentido horário
+        const a2 = -Math.PI / 2 + (i + 1) * step - gap / 2;
+        const mid = (a1 + a2) / 2;
+        const cx = CX + Math.cos(mid) * sep;
+        const cy = CY + Math.sin(mid) * sep * (RY / RX);
+        const x1 = cx + RX * Math.cos(a1), y1 = cy + RY * Math.sin(a1);
+        const x2 = cx + RX * Math.cos(a2), y2 = cy + RY * Math.sin(a2);
+        const large = (a2 - a1) > Math.PI ? 1 : 0;
+        const fill = i < n ? colN : colR;
+        parts.push(`<path d="M${cx.toFixed(2)},${cy.toFixed(2)} L${x1.toFixed(2)},${y1.toFixed(2)} A${RX},${RY} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${fill}" stroke="#ffffff" stroke-width="1.6" stroke-linejoin="round"/>`);
+        if (numbers) {
+          const tx = cx + RX * 0.6 * Math.cos(mid), ty = cy + RY * 0.6 * Math.sin(mid);
+          parts.push(`<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-family="Nunito, Arial, sans-serif" font-size="13" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="${textOn(fill)}">${i + 1}</text>`);
+        }
+      }
+    }
+    const title = label ? `<title>${esc(label)}</title>` : '';
+    return `<svg class="${cls}" viewBox="0 0 ${VW} ${VH}" role="img" aria-label="${esc(label)}">${title}${parts.join('')}</svg>`;
+  }
+
+  // Grupo de bolos para uma fração f (|f| pode ser imprópria: vários bolos).
+  // maxDraw limita quantos bolos são desenhados; devolve também o número total.
+  function group(f, { colN, colR, separate = true, numbers = false, cls = 'cake', maxDraw = 8 } = {}) {
+    const total = Frac.cakeCount(f);
+    const shown = Math.min(total, maxDraw);
+    let html = '';
+    for (let k = 0; k < shown; k++) {
+      const n = Frac.coloredInCake(f, k);
+      const label = `Bolo ${k + 1} de ${total}: ${n} de ${f.d} fatias pintadas`;
+      html += svg({ d: f.d, n, colN, colR, separate, numbers, label, cls });
+    }
+    return { html, total, shown };
+  }
+
+  return { svg, group, textOn, esc };
+})();
+
+
+
+/* Aba "Construir": fila de frações (bolos), operadores entre elas, "=" e o bolo resultado. */
+const Builder = (() => {
+  const MIN_OPS = 2, MAX_OPS = 5;
+  const MAX_DEN = 20, MAX_CAKES = 4;   // até 4 bolos por fração imprópria
+  const MAX_DRAW_DEN = 30;              // acima disso não desenhamos fatias
+  const PALETTE = ['#e8743b', '#2a9d8f', '#8e6cc9', '#d9a21b', '#d1495b'];
+  const REST = '#f2e0bd';
+  const RESULT_N = '#237253';
+  const OPS = ['+', '-', '*', '/'];
+
+  const EXAMPLES = [
+    { label: '1/2 + 1/3', items: [[1, 2], [1, 3]], ops: ['+'] },
+    { label: '3/4 − 1/8', items: [[3, 4], [1, 8]], ops: ['-'] },
+    { label: '2/3 × 3/4', items: [[2, 3], [3, 4]], ops: ['*'] },
+    { label: '1/2 ÷ 1/4', items: [[1, 2], [1, 4]], ops: ['/'] },
+    { label: '5/4 + 3/4', items: [[5, 4], [3, 4]], ops: ['+'] },
+    { label: '1/2 + 1/3 × 2/3', items: [[1, 2], [1, 3], [2, 3]], ops: ['+', '*'] },
+    { label: '1/2 ÷ 0/3', items: [[1, 2], [0, 3]], ops: ['/'] }
+  ];
+
+  const state = { items: [], ops: [], separate: true, numbers: false };
+
+  const $ = id => document.getElementById(id);
+  const queue = () => $('queue');
+  const esc = Cake.esc;
+
+  const newItem = (i, num = 1, den = 2) => ({ num, den, colN: PALETTE[i % PALETTE.length], colR: REST });
+  const fracHTML = (f, size = '') =>
+    `<span class="frac ${size}" title="${f.n} sobre ${f.d}"><span class="num">${Math.abs(f.n)}</span><span class="bar"></span><span class="den">${f.d}</span></span>`;
+
+  function operandNote(f) {
+    if (f.n === 0) return 'Nenhuma parte pintada';
+    if (f.n === f.d) return 'Bolo inteiro';
+    if (f.n > f.d) return `Mais que um bolo: ${Frac.mixedText(f)}`;
+    return `${f.n} de ${f.d} partes pintadas`;
+  }
+
+  const opSlotHTML = i => `
+    <div class="op-slot">
+      <select class="op-select" data-op="${i}" aria-label="Operação entre a fração ${i + 1} e a fração ${i + 2}">
+        ${OPS.map(o => `<option value="${o}"${state.ops[i] === o ? ' selected' : ''}>${Frac.SYM[o]}</option>`).join('')}
+      </select>
+    </div>`;
+
+  // Monta a estrutura da fila (só quando fração/operador são adicionados ou removidos)
+  function buildStructure() {
+    let h = '';
+    state.items.forEach((it, i) => {
+      const canRemove = state.items.length > MIN_OPS;
+      h += `
+      <article class="op-card" data-i="${i}">
+        <header>
+          <span class="title">Fração ${i + 1}</span>
+          ${canRemove ? `<button class="btn small danger" data-act="remove" aria-label="Remover fração ${i + 1}">Remover</button>` : ''}
+        </header>
+        <div class="cakes" data-role="cakes"></div>
+        <div class="fraction-box">
+          <div data-role="frac"></div>
+          <div class="note" data-role="note"></div>
+        </div>
+        <div class="inputs">
+          <label class="field"><span>Numerador</span>
+            <input id="num-${i}" type="number" inputmode="numeric" min="0" step="1" value="${it.num}" data-field="num"></label>
+          <label class="field"><span>Denominador</span>
+            <input id="den-${i}" type="number" inputmode="numeric" min="1" max="${MAX_DEN}" step="1" value="${it.den}" data-field="den"></label>
+        </div>
+        <div class="colors">
+          <label class="field"><span>Cor das pintadas</span>
+            <input type="color" value="${it.colN}" data-field="colN"></label>
+          <label class="field"><span>Cor das demais</span>
+            <input type="color" value="${it.colR}" data-field="colR"></label>
+        </div>
+      </article>`;
+      if (i < state.items.length - 1) h += opSlotHTML(i);
+    });
+    h += `
+      <div class="result-pair">
+        <div class="equals" aria-hidden="true">=</div>
+        <article class="op-card result-card" id="result-card" aria-live="polite">
+          <header><span class="title">Resultado</span></header>
+          <div class="cakes" data-role="rcakes"></div>
+          <div data-role="rbody"></div>
+        </article>
+      </div>`;
+    queue().innerHTML = h;
+    $('add-op').disabled = state.items.length >= MAX_OPS;
+  }
+
+  // Atualiza bolos, frações, notas e resultado sem recriar os campos (preserva o foco)
+  function updateAll() {
+    state.items.forEach((it, i) => {
+      const card = queue().querySelector(`.op-card[data-i="${i}"]`);
+      if (!card) return;
+      const max = MAX_CAKES * it.den;
+      if (it.num > max) it.num = max;
+      const numInput = card.querySelector('[data-field="num"]');
+      numInput.max = max;
+      if (Number(numInput.value) !== it.num && document.activeElement !== numInput) numInput.value = it.num;
+
+      const f = { n: it.num, d: it.den };
+      const g = Cake.group(f, { colN: it.colN, colR: it.colR, separate: state.separate, numbers: state.numbers, cls: 'cake' });
+      card.querySelector('[data-role="cakes"]').innerHTML = g.html;
+      card.querySelector('[data-role="frac"]').innerHTML = fracHTML(f, 'mid');
+      card.querySelector('[data-role="note"]').textContent = operandNote(f);
+    });
+
+    const res = Frac.evaluate(state.items.map(it => ({ n: it.num, d: it.den })), state.ops);
+    renderResult(res);
+    renderSteps(res);
+  }
+
+  function renderResult(res) {
+    const card = $('result-card');
+    const cakesBox = card.querySelector('[data-role="rcakes"]');
+    const body = card.querySelector('[data-role="rbody"]');
+    card.classList.toggle('error', !!res.error);
+
+    if (res.error) {
+      cakesBox.innerHTML = '';
+      body.innerHTML = `<div class="result-msg">${esc(res.error)}</div>`;
+      return;
+    }
+
+    const s = res.simp;
+    const neg = s.n < 0;
+    const sign = neg ? '<span class="sign">−</span>' : '';
+    const lines = [];
+
+    if (s.d <= MAX_DRAW_DEN) {
+      const g = Cake.group(s, { colN: RESULT_N, colR: REST, separate: state.separate, numbers: state.numbers, cls: 'cake lg', maxDraw: 8 });
+      cakesBox.innerHTML = g.html;
+      if (g.total > g.shown) lines.push(`Mostrando ${g.shown} de ${g.total} bolos.`);
+    } else {
+      cakesBox.innerHTML = '';
+      lines.push(`O denominador ${s.d} é grande demais para desenhar em fatias. Use a fração e o decimal.`);
+    }
+
+    if (res.raw && !(res.raw.n === s.n && res.raw.d === s.d)) {
+      lines.push(`Antes de simplificar: <strong>${Frac.strSigned(res.raw)}</strong>`);
+    }
+    if (s.d === 1) lines.push(`Número inteiro: <strong>${sign ? '−' : ''}${Math.abs(s.n)}</strong>`);
+    else if (Frac.isImproper(s)) lines.push(`Número misto: <strong>${sign ? '−' : ''}${Frac.mixedText(s)}</strong>`);
+    if (s.d > 1) lines.push(`Decimal: <strong>${sign ? '−' : ''}${Frac.decimal({ n: Math.abs(s.n), d: s.d })}</strong>`);
+    if (neg) lines.push('Resultado negativo: os bolos mostram só o tamanho da parte, sem o sinal.');
+
+    body.innerHTML = `
+      <div class="result-frac">${sign}${fracHTML({ n: Math.abs(s.n), d: s.d }, 'big')}</div>
+      <div class="result-lines">${lines.map(l => `<span>${l}</span>`).join('')}</div>`;
+  }
+
+  function renderSteps(res) {
+    let h = '';
+    if (res.mixed) {
+      h += `<p class="precedence">Ordem das operações: primeiro as multiplicações e divisões, da esquerda para a direita; depois as somas e subtrações.</p>`;
+    }
+    res.groups.forEach((g, gi) => {
+      h += `<h3 class="group-title">Operação ${gi + 1}: ${esc(g.heading)}</h3>`;
+      h += `<ol class="steps">`;
+      g.steps.forEach(s => {
+        h += `<li><div><div class="step-title">${esc(s.title)}</div><p>${esc(s.text)}</p><div class="math">${esc(s.math)}</div></div></li>`;
+      });
+      h += `</ol>`;
+      if (g.error) h += `<div class="result-msg">${esc(g.error)}</div>`;
+    });
+    $('steps-body').innerHTML = h;
+  }
+
+  // Entrada de números: atualiza enquanto digita, valida ao sair do campo
+  function readInt(input) {
+    const v = parseInt(input.value, 10);
+    return Number.isFinite(v) ? v : null;
+  }
+
+  function onInput(e) {
+    const t = e.target;
+    if (t.matches('[data-field]')) {
+      const card = t.closest('.op-card[data-i]');
+      if (!card) return;
+      const it = state.items[Number(card.dataset.i)];
+      const field = t.dataset.field;
+      if (field === 'colN' || field === 'colR') {
+        it[field] = t.value;
+        updateAll();
+        return;
+      }
+      const v = readInt(t);
+      if (v === null) return;
+      if (field === 'den' && v >= 1 && v <= MAX_DEN) { it.den = v; updateAll(); }
+      if (field === 'num' && v >= 0 && v <= MAX_CAKES * it.den) { it.num = v; updateAll(); }
+    }
+  }
+
+  function onChange(e) {
+    const t = e.target;
+    if (t.matches('.op-select')) {
+      state.ops[Number(t.dataset.op)] = t.value;
+      updateAll();
+      return;
+    }
+    if (t.matches('[data-field="num"], [data-field="den"]')) {
+      const card = t.closest('.op-card[data-i]');
+      const it = state.items[Number(card.dataset.i)];
+      const field = t.dataset.field;
+      let v = readInt(t);
+      if (v === null) v = field === 'den' ? it.den : it.num;
+      if (field === 'den') v = Math.min(MAX_DEN, Math.max(1, v));
+      else v = Math.min(MAX_CAKES * it.den, Math.max(0, v));
+      it[field === 'den' ? 'den' : 'num'] = v;
+      t.value = v;
+      updateAll();
+    }
+  }
+
+  function onClick(e) {
+    const btn = e.target.closest('[data-act="remove"]');
+    if (!btn) return;
+    const i = Number(btn.closest('.op-card').dataset.i);
+    state.items.splice(i, 1);
+    // Remove o operador ligado a esta fração: o anterior, ou o seguinte se for a primeira
+    state.ops.splice(i === 0 ? 0 : i - 1, 1);
+    buildStructure();
+    updateAll();
+  }
+
+  function addFraction() {
+    if (state.items.length >= MAX_OPS) return;
+    state.items.push(newItem(state.items.length));
+    state.ops.push('+');
+    buildStructure();
+    updateAll();
+  }
+
+  function setExpression(items, ops) {
+    state.items = items.map((p, i) => newItem(i, p[0], p[1]));
+    state.ops = ops.slice();
+    buildStructure();
+    updateAll();
+  }
+
+  function randomExpression() {
+    const dens = [2, 3, 4, 5, 6, 8, 10, 12];
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    const count = Math.random() < 0.5 ? 2 : 3;
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      const d = pick(dens);
+      items.push([1 + Math.floor(Math.random() * d), d]);
+    }
+    const ops = [];
+    for (let j = 0; j < count - 1; j++) ops.push(pick(OPS));
+    setExpression(items, ops);
+  }
+
+  function renderExamples() {
+    $('examples').innerHTML = EXAMPLES.map((ex, i) =>
+      `<button type="button" class="chip" data-example="${i}">${esc(ex.label)}</button>`).join('');
+  }
+
+  function init() {
+    renderExamples();
+    $('examples').addEventListener('click', e => {
+      const b = e.target.closest('[data-example]');
+      if (!b) return;
+      const ex = EXAMPLES[Number(b.dataset.example)];
+      setExpression(ex.items, ex.ops);
+    });
+    $('add-op').addEventListener('click', addFraction);
+    $('random-op').addEventListener('click', randomExpression);
+    $('show-separate').addEventListener('change', e => { state.separate = e.target.checked; updateAll(); });
+    $('show-numbers').addEventListener('change', e => { state.numbers = e.target.checked; updateAll(); });
+    queue().addEventListener('input', onInput);
+    queue().addEventListener('change', onChange);
+    queue().addEventListener('click', onClick);
+
+    setExpression([[1, 2], [1, 3]], ['+']);
+  }
+
+  return { init, state, setExpression, EXAMPLES };
+})();
+
+/* Aba "Praticar": exercícios gerados na hora, com correção e explicação. */
+const Practice = (() => {
+  const $ = id => document.getElementById(id);
+  const esc = Cake.esc;
+  const N_COLOR = '#e8743b', REST = '#f2e0bd';
+  const TYPES = ['identify', 'simplify', 'equiv', 'compare', 'operate'];
+  const TYPE_LABEL = { mix: 'Misturar', identify: 'Ler o bolo', simplify: 'Simplificar', equiv: 'Equivalentes', compare: 'Comparar', operate: 'Operações' };
+  const LEVELS = {
+    facil: { label: 'Fácil', maxDen: 6, ops: ['+', '-'] },
+    medio: { label: 'Médio', maxDen: 10, ops: ['+', '-', '*'] },
+    dificil: { label: 'Difícil', maxDen: 12, ops: ['+', '-', '*', '/'] }
+  };
+  const SYM_CMP = { '-1': '<', '0': '=', '1': '>' };
+
+  const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const randDen = max => 2 + rnd(max - 1);                 // 2..max
+  const properFrac = d => ({ n: 1 + rnd(d - 1), d });       // 1..d-1 (d >= 2)
+
+  const fr = (f, size = '') =>
+    `<span class="frac ${size}"><span class="num">${f.n}</span><span class="bar"></span><span class="den">${f.d}</span></span>`;
+  const item = f => `<div class="cake-wrap"><div class="cakes">${Cake.group(f, { colN: N_COLOR, colR: REST, cls: 'cake' }).html}</div>${fr(f, 'mid')}</div>`;
+  const toInt = el => (el && /^\d+$/.test(el.value.trim()) ? parseInt(el.value, 10) : null);
+
+  const state = { type: 'mix', level: 'facil', correct: 0, total: 0, streak: 0, q: null, answered: false };
+
+  // Geradores de exercícios
+  const GEN = {
+    identify(L) {
+      const f = properFrac(randDen(L.maxDen));
+      const opts = [f];
+      for (let guard = 0; opts.length < 4 && guard < 300; guard++) {
+        const cand = properFrac(randDen(L.maxDen));
+        if (opts.every(o => !Frac.equal(o, cand))) opts.push(cand);
+      }
+      return { kind: 'identify', f, options: shuffle(opts) };
+    },
+    simplify(L) {
+      let p, q;
+      do { q = randDen(L.maxDen); p = 1 + rnd(q - 1); } while (Frac.gcd(p, q) !== 1);
+      const k = 2 + rnd(3);
+      return { kind: 'simplify', n: p * k, d: q * k, target: { n: p, d: q } };
+    },
+    equiv(L) {
+      const q = randDen(L.maxDen), p = 1 + rnd(q - 1), k = 2 + rnd(3);
+      return { kind: 'equiv', f: { n: p, d: q }, Q: q * k, k, answer: p * k };
+    },
+    compare(L) {
+      const a = properFrac(randDen(L.maxDen));
+      let b;
+      if (Math.random() < 0.2) {
+        const k = 2 + rnd(2);
+        b = { n: a.n * k, d: a.d * k };
+      } else {
+        let tries = 0;
+        do { b = properFrac(randDen(L.maxDen)); tries++; } while (Frac.equal(a, b) && tries < 60);
+      }
+      return Math.random() < 0.5 ? { kind: 'compare', a, b } : { kind: 'compare', a: b, b: a };
+    },
+    operate(L) {
+      const op = pick(L.ops);
+      let a = properFrac(randDen(L.maxDen));
+      let b = properFrac(randDen(L.maxDen));
+      if (op === '-' && Frac.compare(a, b) < 0) [a, b] = [b, a];
+      const r = Frac.evaluate([a, b], [op]);
+      return { kind: 'operate', items: [a, b], ops: [op], expected: r.simp, steps: r.groups[0].steps };
+    }
+  };
+
+  function makeQuestion() {
+    const L = LEVELS[state.level];
+    const kind = state.type === 'mix' ? pick(TYPES) : state.type;
+    state.q = GEN[kind](L);
+    state.answered = false;
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = state.q;
+    const prompt = $('p-prompt'), visual = $('p-visual'), answer = $('p-answer');
+    $('p-feedback').innerHTML = '';
+    $('p-check').textContent = 'Verificar';
+
+    switch (q.kind) {
+      case 'identify':
+        prompt.textContent = 'Qual fração representa a parte pintada do bolo?';
+        visual.innerHTML = `<div class="cakes">${Cake.group(q.f, { colN: N_COLOR, colR: REST, cls: 'cake lg' }).html}</div>`;
+        answer.innerHTML = `<div class="options">${q.options.map((o, i) =>
+          `<button type="button" class="option" data-opt="${i}" aria-pressed="false">${fr(o, 'mid')}</button>`).join('')}</div>`;
+        break;
+      case 'simplify':
+        prompt.textContent = 'Escreva esta fração na forma mais simples.';
+        visual.innerHTML = fr({ n: q.n, d: q.d }, 'big');
+        answer.innerHTML = answerRow();
+        break;
+      case 'equiv':
+        prompt.textContent = `Complete o numerador para formar uma fração equivalente com denominador ${q.Q}.`;
+        visual.innerHTML = `<div class="cakes">${Cake.group(q.f, { colN: N_COLOR, colR: REST, cls: 'cake lg' }).html}</div>`;
+        answer.innerHTML = `<div class="answer"><strong>${q.f.n}/${q.f.d} = </strong><input id="p-n" inputmode="numeric" aria-label="Numerador" autocomplete="off"><span class="slash">/</span><strong>${q.Q}</strong></div>`;
+        break;
+      case 'compare':
+        prompt.textContent = 'Qual símbolo completa a comparação?';
+        visual.innerHTML = `<div class="q-visual">${item(q.a)}<span class="slash">?</span>${item(q.b)}</div>`;
+        answer.innerHTML = `<div class="cmp-options">${['<', '=', '>'].map(s =>
+          `<button type="button" class="option" data-cmp="${s}" aria-pressed="false">${s}</button>`).join('')}</div>`;
+        break;
+      case 'operate':
+        prompt.textContent = 'Calcule e escreva o resultado.';
+        visual.innerHTML = `<div class="q-visual">${item(q.items[0])}<span class="slash">${Frac.SYM[q.ops[0]]}</span>${item(q.items[1])}</div>`;
+        answer.innerHTML = answerRow();
+        break;
+    }
+    const first = answer.querySelector('input, button');
+    if (first) first.focus({ preventScroll: true });
+  }
+
+  function answerRow() {
+    return `<div class="answer"><input id="p-n" inputmode="numeric" aria-label="Numerador" autocomplete="off" placeholder="nº"><span class="slash">/</span><input id="p-d" inputmode="numeric" aria-label="Denominador" autocomplete="off" placeholder="nº"></div>`;
+  }
+
+  function hint(text) {
+    $('p-feedback').innerHTML = `<div class="feedback info">${esc(text)}</div>`;
+  }
+
+  function lockAnswer() {
+    state.answered = true;
+    document.querySelectorAll('#p-answer input, #p-answer button').forEach(el => { el.disabled = true; });
+    $('p-check').textContent = 'Próxima';
+  }
+
+  function record(ok) {
+    state.total++;
+    if (ok) { state.correct++; state.streak++; } else { state.streak = 0; }
+    updateScore();
+  }
+
+  function feedback(ok, title, text, extra = '') {
+    $('p-feedback').innerHTML = `<div class="feedback ${ok ? 'ok' : 'bad'}" role="status"><strong>${esc(title)}</strong>${text ? `<small>${esc(text)}</small>` : ''}${extra}</div>`;
+  }
+
+  function submit() {
+    const q = state.q;
+    if (!q) return;
+    if (state.answered) { makeQuestion(); return; }
+
+    if (q.kind === 'identify') {
+      const sel = document.querySelector('#p-answer [aria-pressed="true"]');
+      if (!sel) return hint('Escolha uma opção antes de verificar.');
+      const chosen = q.options[Number(sel.dataset.opt)];
+      const ok = Frac.equal(chosen, q.f);
+      lockAnswer();
+      document.querySelectorAll('#p-answer .option').forEach(b => {
+        const o = q.options[Number(b.dataset.opt)];
+        if (Frac.equal(o, q.f)) b.classList.add('correct');
+        else if (b === sel) b.classList.add('wrong');
+      });
+      record(ok);
+      feedback(ok, ok ? 'Isso mesmo!' : 'Quase lá.', `${q.f.n} fatias estão pintadas, de um total de ${q.f.d} fatias iguais. Resposta: ${q.f.n}/${q.f.d}.`);
+      return;
+    }
+
+    if (q.kind === 'compare') {
+      const sel = document.querySelector('#p-answer [aria-pressed="true"]');
+      if (!sel) return hint('Escolha <, = ou > antes de verificar.');
+      const correct = SYM_CMP[Frac.compare(q.a, q.b)];
+      const ok = sel.dataset.cmp === correct;
+      lockAnswer();
+      document.querySelectorAll('#p-answer .option').forEach(b => {
+        if (b.dataset.cmp === correct) b.classList.add('correct');
+        else if (b === sel) b.classList.add('wrong');
+      });
+      record(ok);
+      const how = q.a.d === q.b.d
+        ? `As frações têm o mesmo denominador (${q.a.d}), então basta comparar os numeradores: ${q.a.n} e ${q.b.n}.`
+        : `Multiplicamos em cruz: ${q.a.n} × ${q.b.d} = ${q.a.n * q.b.d} e ${q.b.n} × ${q.a.d} = ${q.b.n * q.a.d}.`;
+      feedback(ok, ok ? 'Correto!' : `A resposta certa é ${correct}.`, how);
+      return;
+    }
+
+    // Exercícios com campos numéricos
+    const nEl = $('p-n'), dEl = $('p-d');
+    const n = toInt(nEl);
+    const d = dEl ? toInt(dEl) : q.kind === 'equiv' ? q.Q : null;
+    if (n === null || (q.kind !== 'equiv' && d === null)) return hint('Preencha o numerador e o denominador.');
+    if (q.kind !== 'equiv' && d === 0) return hint('O denominador não pode ser zero.');
+
+    if (q.kind === 'equiv') {
+      const ok = n === q.answer;
+      lockAnswer();
+      record(ok);
+      feedback(ok, ok ? 'Isso mesmo!' : 'Quase lá.',
+        `Multiplicamos numerador e denominador por ${q.k} (${q.Q} ÷ ${q.f.d} = ${q.k}): ${q.f.n} × ${q.k} = ${q.answer}.`);
+      return;
+    }
+
+    if (q.kind === 'simplify') {
+      const user = { n, d };
+      const ok = n === q.target.n && d === q.target.d;
+      lockAnswer();
+      record(ok);
+      const g = Frac.gcd(q.n, q.d);
+      if (ok) {
+        feedback(true, 'Isso mesmo!', `O MDC de ${q.n} e ${q.d} é ${g}. Dividindo os dois por ${g}, chegamos a ${q.target.n}/${q.target.d}.`);
+      } else if (Frac.equal(user, q.target)) {
+        feedback(false, 'Ainda dá para simplificar.', `A fração ${n}/${d} tem o mesmo valor, mas não é a mais simples. Resposta: ${q.target.n}/${q.target.d}.`);
+      } else {
+        feedback(false, 'Não é a forma simplificada.', `Divida numerador e denominador pelo MDC, que é ${g}. Resposta: ${q.target.n}/${q.target.d}.`);
+      }
+      return;
+    }
+
+    if (q.kind === 'operate') {
+      const user = { n, d };
+      const ok = Frac.equal(user, q.expected);
+      lockAnswer();
+      record(ok);
+      const simplified = Frac.gcd(n, d) === 1 || n === 0;
+      const shownAnswer = q.expected.d === 1 ? String(q.expected.n) : Frac.strSigned(q.expected);
+      const text = ok && !simplified
+        ? `Correto, mas a forma mais simples é ${Frac.strSigned(q.expected)}.`
+        : `Resposta: ${shownAnswer}.`;
+      const steps = q.steps.map(s => `<li><strong>${esc(s.title)}:</strong> ${esc(s.math)}</li>`).join('');
+      feedback(ok, ok ? 'Isso mesmo!' : 'Quase lá.', text,
+        `<ol class="mini-steps">${steps}</ol><button type="button" class="btn small" data-open-builder>Ver no construtor</button>`);
+      return;
+    }
+  }
+
+  function updateScore() {
+    $('p-score').textContent = `Acertos: ${state.correct} de ${state.total}`;
+    $('p-streak').textContent = `Sequência: ${state.streak}`;
+  }
+
+  function init() {
+    // Tipos de exercício
+    const types = ['mix', ...TYPES];
+    $('p-types').innerHTML = types.map(t =>
+      `<button type="button" class="chip" data-type="${t}" aria-pressed="${t === state.type}">${TYPE_LABEL[t]}</button>`).join('');
+    $('p-types').addEventListener('click', e => {
+      const b = e.target.closest('[data-type]');
+      if (!b) return;
+      state.type = b.dataset.type;
+      $('p-types').querySelectorAll('[data-type]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      makeQuestion();
+    });
+    // Níveis
+    $('p-level').innerHTML = Object.entries(LEVELS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+    $('p-level').value = state.level;
+    $('p-level').addEventListener('change', e => { state.level = e.target.value; makeQuestion(); });
+
+    // Respostas por clique (identify / compare)
+    $('p-answer').addEventListener('click', e => {
+      if (state.answered) return;
+      const b = e.target.closest('.option');
+      if (!b) return;
+      const group = b.parentElement;
+      group.querySelectorAll('.option').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    });
+    $('p-feedback').addEventListener('click', e => {
+      if (e.target.closest('[data-open-builder]') && state.q && state.q.kind === 'operate') {
+        window.openInBuilder(state.q.items, state.q.ops);
+      }
+    });
+    $('p-form').addEventListener('submit', e => { e.preventDefault(); submit(); });
+    $('p-reset').addEventListener('click', () => {
+      state.correct = 0; state.total = 0; state.streak = 0; updateScore(); makeQuestion();
+    });
+
+    updateScore();
+    makeQuestion();
+  }
+
+  return { init };
+})();
+
+/* Aba "Conceitos": explicações curtas com exemplos desenhados em bolos. */
+const Concepts = (() => {
+  const N = '#e8743b', REST = '#f2e0bd';
+
+  const frac = (f, size = 'sm') =>
+    `<span class="frac ${size}" aria-label="${f.n} sobre ${f.d}"><span class="num">${f.n}</span><span class="bar"></span><span class="den">${f.d}</span></span>`;
+
+  // Um ou mais bolos com a fração embaixo
+  const show = (f, cls = 'cake') =>
+    `<div class="cake-wrap"><div class="cakes">${Cake.group(f, { colN: N, colR: REST, cls }).html}</div>${frac(f)}</div>`;
+
+  const eq = '<span class="slash" aria-hidden="true">=</span>';
+
+  const CARDS = [
+    {
+      title: 'Partes de uma fração',
+      text: 'O denominador diz em quantas partes iguais o inteiro foi dividido. O numerador diz quantas dessas partes estamos considerando.',
+      rule: '3/8: numerador 3 (pintadas), denominador 8 (total de fatias)',
+      visual: show({ n: 3, d: 8 }, 'cake lg')
+    },
+    {
+      title: 'Frações equivalentes',
+      text: 'Frações diferentes podem representar a mesma parte do inteiro. Multiplique ou divida numerador e denominador pelo mesmo número.',
+      rule: '1/2 = 2/4 = 4/8',
+      visual: show({ n: 1, d: 2 }) + eq + show({ n: 2, d: 4 }) + eq + show({ n: 4, d: 8 })
+    },
+    {
+      title: 'Simplificar',
+      text: 'Divida numerador e denominador pelo MDC (o maior número que divide os dois). Quando o MDC é 1, a fração já está na forma mais simples.',
+      rule: '6/8 ÷ 2 = 3/4, pois o MDC de 6 e 8 é 2',
+      visual: show({ n: 6, d: 8 }) + eq + show({ n: 3, d: 4 })
+    },
+    {
+      title: 'Frações impróprias e mistas',
+      text: 'Quando o numerador é maior que o denominador, a fração representa mais que um inteiro. Em número misto, separamos os inteiros da parte que sobra.',
+      rule: '5/4 = 1 inteiro + 1/4 = 1 1/4',
+      visual: show({ n: 5, d: 4 })
+    },
+    {
+      title: 'Comparar frações',
+      text: 'Com o mesmo denominador, vence o maior numerador. Com denominadores diferentes, transforme em frações equivalentes ou multiplique em cruz.',
+      rule: '2/3 e 3/4: 2 × 4 = 8 e 3 × 3 = 9, logo 2/3 < 3/4',
+      visual: show({ n: 2, d: 3 }) + '<span class="slash" aria-hidden="true">&lt;</span>' + show({ n: 3, d: 4 })
+    },
+    {
+      title: 'Somar e subtrair',
+      text: 'Com denominadores iguais, some os numeradores e mantenha o denominador. Com denominadores diferentes, use o MMC como denominador comum.',
+      rule: '1/2 + 1/3 = 3/6 + 2/6 = 5/6',
+      visual: show({ n: 1, d: 2 }) + '<span class="slash" aria-hidden="true">+</span>' + show({ n: 1, d: 3 }) + eq + show({ n: 5, d: 6 })
+    },
+    {
+      title: 'Multiplicar',
+      text: 'Multiplique os numeradores entre si e os denominadores entre si. Multiplicar por 1/2 é pegar a metade.',
+      rule: '1/2 × 1/2 = 1/4: a metade de meio bolo',
+      visual: show({ n: 1, d: 2 }) + '<span class="slash" aria-hidden="true">×</span>' + show({ n: 1, d: 2 }) + eq + show({ n: 1, d: 4 })
+    },
+    {
+      title: 'Dividir',
+      text: 'Dividir por uma fração é multiplicar pelo inverso dela, ou seja, trocar numerador e denominador do divisor. Pergunta prática: quantos pedaços de 1/4 cabem em 1/2?',
+      rule: '1/2 ÷ 1/4 = 1/2 × 4/1 = 4/2 = 2',
+      visual: show({ n: 1, d: 2 }) + '<span class="slash" aria-hidden="true">÷</span>' + show({ n: 1, d: 4 })
+    }
+  ];
+
+  function init() {
+    const box = document.getElementById('concepts');
+    box.innerHTML = CARDS.map(c => `
+      <article class="panel concept">
+        <h2>${c.title}</h2>
+        <p>${c.text}</p>
+        <div class="examples">${c.visual}</div>
+        <p class="rule">${c.rule}</p>
+      </article>`).join('');
+  }
+
+  return { init };
+})();
+
+/* Navegação entre as abas e inicialização. */
+(function () {
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const views = { build: 'view-build', practice: 'view-practice', concepts: 'view-concepts' };
+
+  function showTab(name, focus = false) {
+    tabs.forEach(t => {
+      const on = t.dataset.tab === name;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      if (on && focus) t.focus();
+    });
+    Object.entries(views).forEach(([key, id]) => {
+      document.getElementById(id).hidden = key !== name;
+    });
+  }
+
+  document.querySelector('.tabs').addEventListener('click', e => {
+    const t = e.target.closest('.tab');
+    if (t) showTab(t.dataset.tab);
+  });
+
+  // Setas esquerda/direita movem entre abas (padrão de tablist)
+  document.querySelector('.tabs').addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const i = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+    const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    showTab(next.dataset.tab, true);
+  });
+
+  // Usado pela aba Praticar: abre a operação no construtor
+  window.openInBuilder = (items, ops) => {
+    Builder.setExpression(items.map(f => [f.n, f.d]), ops);
+    showTab('build');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  Builder.init();
+  Practice.init();
+  Concepts.init();
+})();
+
+</script>
